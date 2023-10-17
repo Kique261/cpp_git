@@ -1,97 +1,100 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
+#include<iostream>
+#include<vector>
+#include<chrono>
+#include<algorithm>
+#include<cstdlib>
+#include<iomanip>
+#include<windows.h>
+
 using namespace std;
+using namespace chrono;
 
-void random_char(int length,vector<char>&chs){
-    srand(time(0));
-    for (int i = 0; i < length; i++)
+const unsigned int n=10;
+const unsigned int m=2*n -1;
+
+struct TreeNode {
+    float weight;
+    int parent;
+    int leftChild;
+    int rightChild;
+};
+class HuffmanTree {
+    public:
+        TreeNode hfmNodes[m+1];
+    public:
+        HuffmanTree(int weights[n]);
+        void findMinNode(int k, int &s1, int &s2);
+        void showInfo(){
+            for(int i=0; i<m; i++) {
+                cout<<hfmNodes[i].weight<<endl;
+            }
+        }
+        void scan(int position){
+            if(n==-1){
+                return;
+            }
+            cout <<hfmNodes[position].weight;
+            scan(hfmNodes[position].leftChild);
+            scan(hfmNodes[position].rightChild);
+        }
+        void scan_all(){
+            scan(m);
+        }
+};
+HuffmanTree::HuffmanTree(int weights[n]) {
+    int firstMin;
+    int secondMin;
+    for(int i = 1; i <= m; i++) {
+        hfmNodes[i].weight = 0;
+        hfmNodes[i].parent = -1;
+        hfmNodes[i].leftChild = -1;
+        hfmNodes[i].rightChild = -1;
+    }
+    for(int i = 1; i <= n; i++)
+    hfmNodes[i].weight=weights[i-1];
+
+    for(int i = n + 1; i <=m; i++) {
+        this->findMinNode(i-1, firstMin, secondMin);
+        hfmNodes[firstMin].parent = i;
+        hfmNodes[secondMin].parent = i;
+        hfmNodes[i].leftChild = firstMin;
+        hfmNodes[i].rightChild = secondMin;
+        hfmNodes[i].weight = hfmNodes[firstMin].weight + hfmNodes[secondMin].weight;
+    }
+}
+void HuffmanTree::findMinNode(int k, int & firstMin, int & secondMin) {
+    hfmNodes[0].weight = 1e9;
+    firstMin=secondMin=0;
+    for(int i=1; i<=k; i++) {
+        if(hfmNodes[i].weight!=0 && hfmNodes[i].parent==-1) {
+            if(hfmNodes[i].weight < hfmNodes[firstMin].weight) { 
+                secondMin = firstMin;
+                firstMin = i;
+            } 
+        else if(hfmNodes[i].weight < hfmNodes[secondMin].weight)
+            secondMin = i;
+        }
+    }
+}
+
+void random(int* weights){
+    srand(time(nullptr));
+    for (int i = 0; i < n; i++)
     {
-        arr[i]=(char)(rand()%(128)+1);
+        weights[i]=rand()%20;
     }
+    
 }
 
-//Huffman树的节点类
-typedef struct Node
-{
-    char value;               //结点的字符值
-    int weight;               //结点字符出现的频度
-    Node *lchild,*rchild;     //结点的左右孩子
-}Node;
-
-//自定义排序规则，即以vector中node结点weight值升序排序
-bool ComNode(Node *p,Node *q)
-{
-    return p->weight<q->weight;
+int main() {
+    int weights[n];
+    random(weights);
+    //auto start1 = system_clock::now();
+    HuffmanTree huffmanTree(weights);
+    HuffmanTree.scan_all();
+    //huffmanTree.showInfo();
+    // auto end = system_clock::now();
+    // auto duration = duration_cast<milliseconds>(end-start1);
+    // cout<<"\nThere are "<<n<<" characters in array."<<"\nIt costs "<<double(duration.count())<<" ms."<<'\n';
+    return 1;
 }
-
-//构造Huffman树，返回根结点指针
-Node* BuildHuffmanTree(vector<Node*> vctNode)
-{
-    while(vctNode.size()>1)                            //vctNode森林中树个数大于1时循环进行合并
-    {
-        sort(vctNode.begin(),vctNode.end(),ComNode);   //依频度高低对森林中的树进行升序排序
-
-        Node *first=vctNode[0];    //取排完序后vctNode森林中频度最小的树根
-        Node *second=vctNode[1];   //取排完序后vctNode森林中频度第二小的树根
-        Node *merge=new Node;      //合并上面两个树
-        merge->weight=first->weight+second->weight;
-        merge->lchild=first;
-        merge->rchild=second;
-
-        vector<Node*>::iterator iter;
-        iter=vctNode.erase(vctNode.begin(),vctNode.begin()+2);    //从vctNode森林中删除上诉频度最小的两个节点first和second
-        vctNode.push_back(merge);                                 //向vctNode森林中添加合并后的merge树
-    }
-    return vctNode[0];            //返回构造好的根节点
-}
-
-//用回溯法来打印编码
-void PrintHuffman(Node *node,vector<int> vctchar)
-{
-    if(node->lchild==NULL && node->rchild==NULL)
-    {//若走到叶子节点，则迭代打印vctchar中存的编码
-        cout<<node->value<<": ";
-        for(vector<int>::iterator iter=vctchar.begin();iter!=vctchar.end();iter++)
-            cout<<*iter;
-        cout<<endl;
-        return;
-    }
-    else
-    {
-        vctchar.push_back(1);     //遇到左子树时给vctchar中加一个1
-        PrintHuffman(node->lchild,vctchar);
-        vctchar.pop_back();       //回溯，删除刚刚加进去的1
-        vctchar.push_back(0);     //遇到左子树时给vctchar中加一个0
-        PrintHuffman(node->rchild,vctchar);
-        vctchar.pop_back();       //回溯，删除刚刚加进去的0
-
-    }
-}
-
-int main()
-{
-    cout<<"************ Huffman编码问题 ***************"<<endl;
-    cout<<"请输入要编码的字符,并以空格隔开（个数任意）："<<endl;
-    vector<Node*> vctNode;        //存放Node结点的vector容器vctNode
-    vector<char>chs;                      //临时存放控制台输入的字符
-    int n = 0;
-    while((ch=getchar())!='\n')
-    {
-        if(ch==' ')continue;      //遇到空格时跳过，即没输入一个字符空一格空格
-        Node *temp=new Node;
-        temp->value=ch;
-        temp->lchild=temp->rchild = NULL;
-        vctNode.push_back(temp);  //将新的节点插入到容器vctNode中
-    }
-
-    cout<<endl<<"请输入每个字符对应的频度，并以空格隔开："<<endl;
-    for(int i=0;i<vctNode.size();i++)
-        cin>>vctNode[i]->weight;
-
-    Node *root = BuildHuffmanTree(vctNode);   //构造Huffman树，将返回的树根赋给root
-    vector<int> vctchar;
-    cout<<endl<<"对应的Huffman编码如下："<<endl;
-    PrintHuffman(root,vctchar);
-}
-
