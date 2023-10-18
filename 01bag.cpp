@@ -24,3 +24,24 @@ class Knap{
     Typep bestp;
 };
 
+template<class Typew,class Typep>
+void Knap<Typew, Typep>::Backtrack(int i){
+    if(i>n){
+        bestp = cp;
+        return;
+    }
+    if (cw+w[i]<=c)
+    {
+        cw += w[i];
+        cp += p[i];
+        Backtrack(i+1);
+        cw -= w[i];
+        cp -= p[i];
+    }
+    if (Bound(i+1)>bestp)
+    {
+       Backtrack(i+1);
+    }  
+}
+
+
