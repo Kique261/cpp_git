@@ -52,10 +52,6 @@ void Backtrack(int t,int c,vector<objects>&all){
     }
     else for(int i=0;i<=1;i++){
         all[t].chosen=i;
-        if(notoverweight(t,c,all)==0){
-            all[t].chosen=0;
-            Backtrack(t+1,c,all);
-        }
         if(notoverweight(t,c,all)){
             Backtrack(t+1,c,all);
         }
@@ -65,7 +61,7 @@ void Backtrack(int t,int c,vector<objects>&all){
 int main(){
     vector<objects> all;
     random_obj(all,7);
-    int c=10;
+    int c=20;
     Backtrack(0,c,all);
     print_chosen(all);
 }
