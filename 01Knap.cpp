@@ -52,23 +52,57 @@ void print_chosen(vector<objects>&all){
     }
 }
 
-void print_vpm(vector<objects>&all){
-    for(int i=0;i<all.size();i++){
-        cout<<all[i].vpw<<' ';
-        if(i==all.size()-1){
-            cout<<'\n';
+// void print_vpm(vector<objects>&all){
+//     for(int i=0;i<all.size();i++){
+//         cout<<all[i].vpw<<' ';
+//         if(i==all.size()-1){
+//             cout<<'\n';
+//         }
+//     }
+// }
+
+int bestp = 0;
+
+int cur_value(int t,vector<objects>&all){
+    int sum=0;
+    for (int i = 0; i <= t; i++)
+    {
+        if(all[i].chosen==1){
+            sum += all[i].value;
         }
     }
+    return sum;
+}
+
+int Bound(int t,vector<objects>&all){
+    int sum = 0;
+    int rest_value=0;
+    for (int i = 0; i <all.size(); i++)
+    {
+        rest_value += all[i].value;
+    }
+
+    for (int i = 0; i <= t; i++)
+    {
+        if(all[i].chosen==1){
+            sum += all[i].value;
+        }
+        rest_value -= all[i].value;
+    }
+    return sum+rest_value;
 }
 
 void Backtrack(int t,int c,vector<objects>&all){
     if(t>=all.size()){
+        if(cur_value(t,all)>bestp){
+            bestp=cur_value(t,all);
+        }
         print_chosen(all);
     }
     else {
             for(int i=0;i<=1;i++){
             all[t].chosen=i;
-            if(notoverweight(t,c,all)){
+            if(notoverweight(t,c,all) && Bound(t+1,all)>bestp){
                 Backtrack(t+1,c,all);
             }
         }
