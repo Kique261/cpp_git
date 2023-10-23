@@ -10,135 +10,133 @@
 
 using namespace std;
 
-const int N = 10;
+const int N = 50;
 bool bestx[N];
-//定义结点。每个节点来记录当前的解。
 struct Node
 {
-    int cp, rp; //cp背包的物品总价值，rp剩余物品的总价值
-    int rw; //剩余容量
-    int id; //物品号
-    bool x[N];//解向量
+    int cur_value, rest_value;
+    int rest_weight;
+    int id;
+    bool x[N];
     Node() {}
-    Node(int _cp, int _rp, int _rw, int _id){
-        cp = _cp;
-        rp = _rp;
-        rw = _rw;
+    Node(int _cur_value, int _rest_value, int _rest_weight, int _id){
+        cur_value = _cur_value;
+        rest_value = _rest_value;
+        rest_weight = _rest_weight;
         id = _id;
-        memset(x, 0, sizeof(x));//解向量初始化为0
+        memset(x, 0, sizeof(x));
     }
 };
-struct Goods
+
+bool cmp_node(Node a,Node b){
+    return (a.cur_value+a.rest_value)<(b.cur_value+b.rest_value);
+}
+
+struct objects
 {
     int value;
     int weight;
-} goods[N];
+} objects[N];
 
-int bestp,W,n,sumw,sumv;
-/*
-  bestp 用来记录最优解。
-  W为购物车最大容量。
-  n为物品的个数。
-  sumw 为所有物品的总重量。
-  sumv 为所有物品的总价值。
-*/
-//bfs 来进行子集树的搜索。
+void rand_objects(int n){
+    srand(time(nullptr));
+    for(int i=1;i<=n;i++){
+        objects[i].value=rand()%29+1;
+        objects[i].weight=rand()%19+1;
+    }
+}
+
+int bestp,W,n,sum_weight,sum_value;
+
 int bfs()
 {
-    int t,tcp,trp,trw;
-    queue<Node> q; //创建一个普通队列(先进先出)
-    q.push(Node(0, sumv, W, 1)); //压入一个初始结点
-    while(!q.empty()) //如果队列不空
+    int t,tcur_value,trest_value,trest_weight;
+    vector<Node> jobs;
+    jobs.push_back(Node(0, sum_value, W, 1)); //初始结点：空背包，rest_value=sum_value,rest_weight=W
+    while(!jobs.empty())
     {
-        Node livenode, lchild, rchild;//定义三个结点型变量
-        livenode=q.front();//取出队头元素作为当前扩展结点livenode
-        q.pop(); //队头元素出队
-        //cp+rp>bestp当前装入的价值+剩余物品价值小于当前最优值时，不再扩展。
-        cout<<"当前结点的id值:"<<livenode.id<<"当前结点的cp值:"<<livenode.cp<<endl;
-        cout<<"当前结点的解向量:";
+        Node livenode, lchild, rchild;//左子节点放入下一物品，右不放入
+        sort(jobs.begin(),jobs.end(),cmp_node);
+        livenode=jobs.back();
+        jobs.pop_back();
+        cout<<"Id："<<livenode.id<<" cur_value: "<<livenode.cur_value<<endl;
+        cout<<"Arr X: ";
         for(int i=1; i<=n; i++)
         {
             cout<<livenode.x[i];
         }
         cout<<endl;
-        t=livenode.id;//当前处理的物品序号
-        // 搜到最后一个物品的时候不需要往下搜索。
-        // 如果当前的购物车没有剩余容量(已经装满)了，不再扩展。
-        if(t>n||livenode.rw==0)
+        t=livenode.id;
+        if(t>n||livenode.rest_weight==0)
         {
-            if(livenode.cp>=bestp)//更新最优解和最优值
+            if(livenode.cur_value>=bestp)//更新最优解和最优值
             {
               for(int i=1; i<=n; i++)
               {
                 bestx[i]=livenode.x[i];
               }
-              bestp=livenode.cp;
+              bestp=livenode.cur_value;
             }
             continue;
         }
-        if(livenode.cp+livenode.rp<bestp)//判断当前结点是否满足限界条件，如果不满足不再扩展
-          continue;
-        //扩展左孩子
-        tcp=livenode.cp; //当前购物车中的价值
-        trp=livenode.rp-goods[t].value; //不管当前物品装入与否，剩余价值都会减少。
-        trw=livenode.rw; //购物车剩余容量
-        if(trw>=goods[t].weight) //满足约束条件，可以放入购物车
+        if(livenode.cur_value+livenode.rest_value<bestp)
+            continue;
+        tcur_value=livenode.cur_value;
+        trest_value=livenode.rest_value-objects[t].value;
+        trest_weight=livenode.rest_weight;
+        if(trest_weight>=objects[t].weight)
         {
-            lchild.rw=trw-goods[t].weight;
-            lchild.cp=tcp+goods[t].value;
-            lchild=Node(lchild.cp,trp,lchild.rw,t+1);//传递参数
+            lchild.rest_weight=trest_weight-objects[t].weight;
+            lchild.cur_value=tcur_value+objects[t].value;
+            lchild=Node(lchild.cur_value,trest_value,lchild.rest_weight,t+1);
             for(int i=1;i<t;i++)
             {
-              lchild.x[i]=livenode.x[i];//复制以前的解向量
+              lchild.x[i]=livenode.x[i];
             }
             lchild.x[t]=true;
-            if(lchild.cp>bestp)//比最优值大才更新
-               bestp=lchild.cp;
-            q.push(lchild);//左孩子入队
+            if(lchild.cur_value>bestp)//比最优值大才更新
+               bestp=lchild.cur_value;
+            jobs.push_back(lchild);
         }
-        //扩展右孩子
-        if(tcp+trp>=bestp)//满足限界条件，不放入购物车
+        if(tcur_value+trest_value>=bestp)
         {
-            rchild=Node(tcp,trp,trw,t+1);//传递参数
+            rchild=Node(tcur_value,trest_value,trest_weight,t+1);
             for(int i=1;i<t;i++)
             {
-              rchild.x[i]=livenode.x[i];//复制以前的解向量
+              rchild.x[i]=livenode.x[i];
             }
             rchild.x[t]=false;
-            q.push(rchild);//右孩子入队
+            jobs.push_back(rchild);
         }
     }
-    return bestp;//返回最优值。
+    return bestp;
 }
 
 int main()
 {
-    //输入物品的个数和背包的容量
-    cout << "请输入物品的个数 n:";
+    cout << "Input the number:\n";
     cin >> n;
-    cout << "请输入购物车的容量W:";
+    cout << "Input the whole weight:\n";
     cin >> W;
-    cout << "请依次输入每个物品的重量w和价值v,用空格分开:";
-    bestp=0; //bestv 用来记录最优解
-    sumw=0; //sumw为所有物品的总重量。
-    sumv=0;   //sum 为所有物品的总价值
+    bestp=0; //最优解
+    sum_weight=0;
+    sum_value=0;
+    rand_objects(n);
     for(int i=1; i<=n; i++)
     {
-        cin >> goods[i].weight >> goods[i].value;//输入第 i 件物品的体积和价值。
-        sumw+= goods[i].weight;
-        sumv+= goods[i].value;
+        sum_weight+= objects[i].weight;
+        sum_value+= objects[i].value;
     }
-    if(sumw<=W)
+    if(sum_weight<=W)
     {
-        bestp=sumv;
-        cout<<"放入购物车的物品最大价值为: "<<bestp<<endl;
-        cout<<"所有的物品均放入购物车。";
+        bestp=sum_value;
+        cout<<"bestp is: "<<bestp<<endl;
+        cout<<"Put all thing in the bag.";
         return 0;
     }
     bfs();
-    cout<<"放入购物车的物品最大价值为: "<<bestp<<endl;
-    cout<<"放入购物车的物品序号为: ";
-    // 输出最优解
+    cout<<"bestp is: "<<bestp<<endl;
+    cout<<"Put these objects in the bag: ";
     for(int i=1; i<=n; i++)
     {
         if(bestx[i])
