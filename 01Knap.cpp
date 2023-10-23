@@ -12,13 +12,19 @@ struct objects
     int value = 0;
     int weight = 0;
     int chosen = 0;
+    double vpw = 0;
 };
+
+bool cmp(objects a,objects b){
+    return a.vpw>b.vpw;
+}
 
 void random_obj(vector<objects>& arr,int n){
     srand(time(nullptr));
     for (int i = 0; i < n; i++)
     {
         arr.push_back({rand()%9+1,rand()%9+1,0});
+        arr[i].vpw=(double)arr[i].value/(double)arr[i].weight;
     }
     
 }
@@ -46,22 +52,36 @@ void print_chosen(vector<objects>&all){
     }
 }
 
-void Backtrack(int t,int c,vector<objects>&all){
-    if(t>=all.size()){
-        print_chosen(all);
-    }
-    else for(int i=0;i<=1;i++){
-        all[t].chosen=i;
-        if(notoverweight(t,c,all)){
-            Backtrack(t+1,c,all);
+void print_vpm(vector<objects>&all){
+    for(int i=0;i<all.size();i++){
+        cout<<all[i].vpw<<' ';
+        if(i==all.size()-1){
+            cout<<'\n';
         }
     }
 }
 
+void Backtrack(int t,int c,vector<objects>&all){
+    if(t>=all.size()){
+        print_chosen(all);
+    }
+    else {
+            for(int i=0;i<=1;i++){
+            all[t].chosen=i;
+            if(notoverweight(t,c,all)){
+                Backtrack(t+1,c,all);
+            }
+        }
+    }
+}
+
+
+
 int main(){
     vector<objects> all;
     random_obj(all,7);
-    int c=20;
+    sort(all.begin(),all.end(),cmp);
+    // print_vpm(all);
+    int c=10;
     Backtrack(0,c,all);
-    print_chosen(all);
 }
