@@ -23,11 +23,12 @@ void random_obj(vector<objects>& arr,int n){
     
 }
 
-bool overweight(int t,int c,vector<objects>&all){
+bool notoverweight(int t,int c,vector<objects>&all){
     int sum=0;
     for(int i=0;i<=t;i++){
         if(all[i].chosen==1){
             sum+=all[i].weight;
+//            cout<<"sum is "<<sum<<'\n';
         }
     }
     if(sum>c){
@@ -36,28 +37,35 @@ bool overweight(int t,int c,vector<objects>&all){
     return true;
 }
 
-void Backtrack(int t,int c,vector<objects>&all){
-    if(t>=all.size()){
-        return;
-    }
-    else for(int i=0;i<=1;i++){
-        all[i].chosen=i;
-        if(overweight(t,c,all)){
-            Backtrack(t+1,c,all);
+void print_chosen(vector<objects>&all){
+    for(int i=0;i<all.size();i++){
+        cout<<all[i].chosen;
+        if(i==all.size()-1){
+            cout<<'\n';
         }
     }
 }
 
-void print_chosen(vector<objects>&all){
-    for(int i=0;i<all.size();i++){
-        cout<<all[i].weight<<all[i].chosen;
+void Backtrack(int t,int c,vector<objects>&all){
+    if(t>=all.size()){
+        print_chosen(all);
+    }
+    else for(int i=0;i<=1;i++){
+        all[t].chosen=i;
+        if(notoverweight(t,c,all)==0){
+            all[t].chosen=0;
+            Backtrack(t+1,c,all);
+        }
+        if(notoverweight(t,c,all)){
+            Backtrack(t+1,c,all);
+        }
     }
 }
 
 int main(){
     vector<objects> all;
     random_obj(all,7);
-    int c=100;
+    int c=10;
     Backtrack(0,c,all);
     print_chosen(all);
 }
