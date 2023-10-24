@@ -23,7 +23,7 @@ class MinNode{
 
 class Graph{
     public:
-        void generateRandomGraph(vector<vector<int>>& edges, int n_node, int n_edge) {
+        void Rand_Graph(vector<vector<int>>& edges, int n_node, int n_edge) {
             srand(time(NULL));
             edges.assign(n_node, vector<int>(n_node, 0));
             for (int i = 0; i < n_edge; i++) {
@@ -64,18 +64,18 @@ class Graph{
             }
         }
 
-        void printAdjacencyMatrix(const vector<vector<int>>& edges) {
+        void print_edges(const vector<vector<int>>& edges) {
             int n = edges.size();
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    cout << edges[i][j] << " ";
+                    cout << setw(5)<< edges[i][j] << " ";
                 }
                 cout << endl;
             }
         }
 
         void Graph2(){
-            cout << "请输入顶点数和边数："<<endl;
+            cout << "请输入顶点数和边数(随机生成边，为了保证连通实际边数会>=输入边数)："<<endl;
             cin >> n_node >> n_edge;
             vector<int> ie1;
             edges.push_back(ie1);
@@ -84,8 +84,8 @@ class Graph{
                 vector<int> ie2(n_node+1,1e9);
                 edges.push_back(ie2);
             }
-            generateRandomGraph(edges,n_node,n_edge);
-            printAdjacencyMatrix(edges);
+            Rand_Graph(edges,n_node,n_edge);
+            print_edges(edges);
         }
 
 
