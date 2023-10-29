@@ -9,16 +9,23 @@
 using namespace std;
 using namespace chrono;
 
-void random(char arr[100]){
-    srand(time(0));
-    for (int i = 0; i < 100; i++)
-    {
-        arr[i]=(char)(rand()%(26)+97);
+void init_array(vector<vector<int>>&arr,int n){
+    vector<int> e(n+1,0);
+    for(int i=0;i<n+1;i++){
+        arr.push_back(e);
     }
-    Sleep(2000);
 }
 
-void lcs_length(int m,int n,char x[100], char y[100],int c[101][101],int b[101][101]){
+
+void random(vector<char>&arr,int n){
+    srand(time(nullptr));
+    for (int i = 0; i <n; i++)
+    {
+        arr.push_back((char)(rand()%(26)+97));
+    }
+}
+
+void lcs_length(int m,int n,vector<char>&x, vector<char>&y,vector<vector<int>>&c,vector<vector<int>>&b){
     int i,j;
     for (i = 1; i <= m; i++)
     {
@@ -50,7 +57,7 @@ void lcs_length(int m,int n,char x[100], char y[100],int c[101][101],int b[101][
     }
 }
 
-void lcs(int i,int j,char x[100],int b[101][101]){
+void lcs(int i,int j,vector<char>&x,vector<vector<int>>&b){
     if (i==0||j==0)
     {
         return;
@@ -58,7 +65,7 @@ void lcs(int i,int j,char x[100],int b[101][101]){
     if (b[i][j]==1)
     {
         lcs(i-1,j-1,x,b);
-        cout << x[i];
+        //cout << x[i];
     }
     else if (b[i][j]==2)
     {
@@ -69,10 +76,10 @@ void lcs(int i,int j,char x[100],int b[101][101]){
     }
 }
 
-void print_str(char arr[100]){
-    for (int i = 0; i < 100; i++)
+void print_str(vector<char>&arr){
+    for (int i = 1; i < arr.size(); i++)
     {
-        if (i!=99)
+        if (i!=arr.size()-1)
         {
             cout << arr[i];
         }
@@ -84,21 +91,30 @@ void print_str(char arr[100]){
     
 }
 
-int main(){
-    char x[100];
-    char y[100];
-    random(x);
-    random(y);
-    int c[101][101];
-    int b[101][101];
-    cout << "This is strings:\n";
-    print_str(x);
-    print_str(y);
+void all_in_one(int n){
+    vector<char>x;
+    vector<char>y;
+    random(x,n);
+    Sleep(2000);
+    random(y,n);
+    vector<vector<int>>c;
+    init_array(c,n+1);
+    vector<vector<int>>b;
+    init_array(b,n+1);
+    //cout << "This is strings:\n";
+    //print_str(x);
+    //print_str(y);
     auto start = system_clock::now();
-    lcs_length(100,100,x,y,c,b);
+    lcs_length(n,n,x,y,c,b);
     auto end = system_clock::now();
     auto duration = duration_cast<microseconds>(end-start);
-    cout << "This is Lcs: \n";
-    lcs(100,100,x,b);
+    //cout << "This is Lcs: \n";
+    lcs(n,n,x,b);
     cout<<"\nIt costs "<<double(duration.count())<<" us."<<'\n';
+}
+
+int main(){
+    all_in_one(100);
+    all_in_one(1000);
+    all_in_one(10000);
 }

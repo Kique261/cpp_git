@@ -18,7 +18,6 @@ void random(vector<int>&arr,int n,int l,int r){
 }
 
 int rand_k(int l,int r){
-    srand(time(0));
     return rand()%(r-l+1)+l;
 }
 
@@ -82,22 +81,25 @@ int select(vector<int>&arr,int l,int r,int k){
     return -1;
 }
 
-void print_all(vector<int>&arr,int l,int r){
+void print_all(vector<int>&arr,int n){
+    random(arr,n,0,n-1);
     //cout << "-----------------------"<<"random array"<<"-----------------------\n";
     //print_arr(arr);
-    int target = rand_k(l,r);
+    int k = rand_k(0,n-1);
     auto start = system_clock::now();
-    int position = select(arr,l,r,target);
-    auto end = system_clock::now();
+    cout<<"k is:" <<k<<" Num is "<<select(arr,0,n-1,k)<<'\n';
+    auto end =system_clock::now();
     auto duration = duration_cast<microseconds>(end-start);
-    cout << "Target is: " << target <<". Its position is: " << position <<". It costs "<<double(duration.count())<<" us."<<'\n';
-    //sort(arr.begin(),arr_100.end());
-    //cout << "-----------------------"<<"array after sort"<<"-------------------\n";
+    //sort(arr.begin(),arr.end());
     //print_arr(arr);
+    cout <<"There are "<< n << " numbers in array. "<< "Liner time select costs " <<double(duration.count())<<" us.\n";
 }
 
 int main(){
+    vector<int> arr_10;
+    print_all(arr_10,10);
     vector<int> arr_100;
-    random(arr_100,1000,0,999);
-    print_all(arr_100,1,1000);
+    print_all(arr_100,100);
+    vector<int> arr_1000;
+    print_all(arr_1000,1000);
 }

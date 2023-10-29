@@ -8,12 +8,27 @@
 using namespace std;
 using namespace chrono;
 
-void print_arr(int m[7][7]){
-    for (int i = 0; i < 7; i++)
+void init_array(vector<vector<int>>&arr,int n){
+    vector<int> e(n+1,0);
+    for(int i=0;i<n+1;i++){
+        arr.push_back(e);
+    }
+}
+
+void random(vector<int>&p,int n){
+    srand(time(0));
+    for (int i = 0; i < n+1; i++)
     {
-        for (int j = 0; j < 7; j++)
+        p.push_back(rand()%20);
+    }
+}
+
+void print_arr(vector<vector<int>>&m,int n){
+    for (int i = 0; i < n+1; i++)
+    {
+        for (int j = 0; j < n+1; j++)
         {
-            if (j%7!=6)
+            if (j%(n+1)!=n)
             {
                 cout << setw(8) << m[i][j];
             }
@@ -27,7 +42,7 @@ void print_arr(int m[7][7]){
     
 }
 
-void matrix_chain(int p[7],int n,int m[7][7],int s[7][7]){
+void matrix_chain(vector<int>&p,int n,vector<vector<int>>&m,vector<vector<int>>&s){
     for(int i=1;i<=n;i++){
         m[i][i]=0;
     }
@@ -49,7 +64,7 @@ void matrix_chain(int p[7],int n,int m[7][7],int s[7][7]){
     }
 }
 
-void trace_back(int i,int j,int s[7][7]){
+void trace_back(int i,int j,vector<vector<int>>&s){
     if (i==j)
     {
         return;
@@ -61,20 +76,37 @@ void trace_back(int i,int j,int s[7][7]){
     
 }
 
-int main(){
-    int col = 6;
-    int row = 6;
-    int p[7] ={30,35,15,5,10,20,25};
-    int m[7][7]={0};
-    int s[7][7]={0};
+void print_all(vector<int>&p,vector<vector<int>>&m,vector<vector<int>>&s,int n){
     auto start = system_clock::now();
-    matrix_chain(p,6,m,s);
+    matrix_chain(p,n,m,s);
     auto end = system_clock::now();
-    auto duration = duration_cast<nanoseconds>(end-start);
-    print_arr(m);
-    cout <<"-----------------------trace back----------------------------\n";
-    trace_back(1,6,s);
-    cout << "It costs "<<double(duration.count())<<" ns.";
+    auto duration = duration_cast<microseconds>(end-start);
+    //print_arr(m,n);
+    //cout <<"-----------------------trace back----------------------------\n";
+    //trace_back(1,n,s);
+    cout <<"There are "<<n<<" matrix in the chain. "<< "It costs "<<double(duration.count())<<" us.\n";
+    return;
+}
 
+void all_in_one(int n){
+    vector<int>p2;
+    random(p2,n);
+    vector<vector<int>> s2;
+    init_array(s2,n);
+    vector<vector<int>> m2;
+    init_array(m2,n);
+    print_all(p2,m2,s2,n);
+}
+
+int main(){
+    vector<int>p ={30,35,15,5,10,20,25};
+    vector<vector<int>> s;
+    init_array(s,6);
+    vector<vector<int>> m;
+    init_array(m,6);
+    print_all(p,m,s,6);
+    all_in_one(10);
+    all_in_one(100);
+    all_in_one(1000);
     return 0;
 }
