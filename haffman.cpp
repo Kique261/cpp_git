@@ -9,10 +9,8 @@
 using namespace std;
 using namespace chrono;
 
-#define MAXCODELEN 100
-#define MAXHAFF 100
-#define MAXCODE 100
-#define MAXWEIGHT  10000;
+#define MAX 100
+#define LIMITW  10000;
 typedef struct Haffman {
 	int weight;
 	char ch;	
@@ -22,7 +20,7 @@ typedef struct Haffman {
 } HaffmaNode;
 
 typedef struct Code {	
-	int code[MAXCODELEN];
+	int code[MAX];
 	int start;
 } HaffmaCode;
 
@@ -35,27 +33,28 @@ class Huff{
             auto start = system_clock::now();
 			buildHaffman(H);
             auto end = system_clock::now();
-            auto duration = duration_cast<microseconds>(end-start);
-			visCode(H);
-			for (int i = 0; i < H; ++i) {
-				std::cout << haffman[i].ch << ": Haffman Code is:";
-				for (int j = code[i].start + 1; j < H; ++j) {
-					std::cout << code[i].code[j];
-				}
-				std::cout << std::endl;
-			}
-            cout<<"There are "<<H<<" chars in it. "<<"\nHafftree-Building costs "<<double(duration.count())<<" us."<<'\n';
+            auto duration = duration_cast<nanoseconds>(end-start);
+			// visCode(H);
+			// for (int i = 0; i < H; ++i) {
+			// 	std::cout << haffarr[i].ch << ": Haffman Code is:";
+			// 	for (int j = code[i].start + 1; j < H; ++j) {
+			// 		std::cout << code[i].code[j];
+			// 	}
+			// 	std::cout << std::endl;
+			// }
+            cout<<"There are "<<H<<" chars in it. "<<"\nHafftree-Building costs "<<double(duration.count())<<" ns."<<'\n';
 	}
-	public:
+
+	private:
 		    void Init(int n){
 		        srand(time(nullptr));
 		        for (int i = 0; i < n*2-1; ++i)
 		        {
-		        	haffman[i].ch=(char)(rand()%(256));
-		            haffman[i].weight = rand()%29+1;
-					haffman[i].parent = -1;
-					haffman[i].leftchild = -1;
-					haffman[i].rightchild = -1;
+		        	haffarr[i].ch=(char)(rand()%(256));
+		            haffarr[i].weight = rand()%29+1;
+					haffarr[i].parent = -1;
+					haffarr[i].leftchild = -1;
+					haffarr[i].rightchild = -1;
 		        }
 		    }
 		
@@ -64,24 +63,24 @@ class Huff{
 			int x1, x2, w1, w2;
 			for (int i = 0; i < H - 1; ++i) {
 				x1 = x2 = -1;
-				w1 = w2 = MAXWEIGHT;
+				w1 = w2 = LIMITW;
 				for (int j = 0; j < H + i; ++j) {
-					if (haffman[j].parent == -1 && haffman[j].weight < w1) {
+					if (haffarr[j].parent == -1 && haffarr[j].weight < w1) {
 						w2 = w1;
 						x2 = x1;
 						x1 = j;
-						w1 = haffman[j].weight;
+						w1 = haffarr[j].weight;
 					}
-					else if(haffman[j].parent == -1 && haffman[j].weight < w2) {
+					else if(haffarr[j].parent == -1 && haffarr[j].weight < w2) {
 						x2 = j;
-						w2 = haffman[j].weight;
+						w2 = haffarr[j].weight;
 					}
 				}
-				haffman[H + i].leftchild = x2;
-				haffman[H + i].rightchild = x1;
-				haffman[H + i].weight = w1 + w2; 
-				haffman[x1].parent = H + i;
-				haffman[x2].parent = H + i;
+				haffarr[H + i].leftchild = x2;
+				haffarr[H + i].rightchild = x1;
+				haffarr[H + i].weight = w1 + w2; 
+				haffarr[x1].parent = H + i;
+				haffarr[x2].parent = H + i;
 			}
 		}
 		void visCode(int H) {
@@ -91,16 +90,16 @@ class Huff{
 			for (int i = 0; i < H; ++i) {
 				cur_code.start = H - 1;
 				c = i; 
-				cur_parent = haffman[i].parent;
+				cur_parent = haffarr[i].parent;
 				while (cur_parent != -1) {
-					if (haffman[cur_parent].leftchild == c) {
+					if (haffarr[cur_parent].leftchild == c) {
 						cur_code.code[cur_code.start] = 1;
 					} else { 
 						cur_code.code[cur_code.start] = 0;
 					}
 					cur_code.start--;
 					c = cur_parent;
-					cur_parent = haffman[c].parent;
+					cur_parent = haffarr[c].parent;
 				}
 				for (int j = cur_code.start + 1; j < H; ++j) {
 					code[i].code[j] = cur_code.code[j];
@@ -109,18 +108,20 @@ class Huff{
 			}
 		}
 	public:
-		HaffmaNode haffman[MAXHAFF];
-		HaffmaCode code[MAXCODE];
+		HaffmaNode haffarr[MAX];
+		HaffmaCode code[MAX];
 		int H;
 		
 }; 
 
 
 int main() {
-	Huff h(10);
-    Huff h2(20);
-    Huff h3(40);
-    Huff h4(80);
-    Huff h5(160);
+	Huff h0(5);
+	Huff h1(10);
+	Huff h2(15);
+    Huff h3(20);
+	Huff h4(30);
+	Huff h5(40);
+	Huff h6(80);
 	return 0;	
 }

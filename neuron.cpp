@@ -77,3 +77,15 @@ int main() {
     vector<double> inputValues = {1.0, 2.0, 3.0};
     myNetwork.FeedForward(inputValues);
 }
+
+
+            for (int i = 1; i < n_node; i++)
+            {
+                for (int j = 1; j < n_node; j++)
+                {
+                    if(i!=j){
+                        edges[i][j]=rand()%80;
+                    }
+                }
+                
+            }

@@ -31,7 +31,7 @@ void random_finish(vector<int>&finish,int n){
     for (int i = 0; i < n; i++)
     {
         if(i==0){
-            finish.push_back(3);
+            finish.push_back(5);
         }
         else
         finish.push_back(rand()%(10)+finish[i-1]);
@@ -41,7 +41,7 @@ void random_finish(vector<int>&finish,int n){
 void random_start(vector<int>&finish,vector<int>&start){
     for (int i = 0; i < finish.size(); i++)
     {
-        start.push_back(finish[i]-rand()%(20));
+        start.push_back(finish[i]-rand()%(finish[i]/2));
     }
     
 }
@@ -65,31 +65,43 @@ void print(vector<type>&arr){
 
 void print_all(int length,vector<int>&start,vector<int>&finish,vector<string>&A){
     random_finish(finish,length);
-    //cout<<"this is finish:\n";
-    //print(finish);
+    // cout<<"this is finish:\n";
+    // print(finish);
     random_start(finish,start);
-    //cout <<"this is start:\n";
-    //print(start);
-    //cout <<"this is array of conclusion:\n";
+    // cout <<"this is start:\n";
+    // print(start);
+    // cout <<"this is array of conclusion:\n";
     auto start1 = system_clock::now();
     GreedySelector(start,finish,A);
     auto end = system_clock::now();
-    //print(A);
+    // print(A);
     auto duration = duration_cast<microseconds>(end-start1);
     cout<<"\nThere are "<<start.size()<<" activities in array."<<"\nIt costs "<<double(duration.count())<<" us."<<'\n';
 }
 
 int main(){
-    vector<int> finish100;
-    vector<int> start100;
-    vector<string> A100;
-    print_all(100,start100,finish100,A100);
+    // vector<int> finish10;
+    // vector<int> start10;
+    // vector<string> A10;
+    // print_all(10,start10,finish10,A10);
     vector<int> finish10000;
     vector<int> start10000;
     vector<string> A10000;
     print_all(10000,start10000,finish10000,A10000);
-    vector<int> finish1000000;
-    vector<int> start1000000;
-    vector<string> A1000000;
-    print_all(10000,start1000000,finish1000000,A1000000);
+    vector<int> finish20000;
+    vector<int> start20000;
+    vector<string> A20000;
+    print_all(20000,start20000,finish20000,A20000);
+    vector<int> finish40000;
+    vector<int> start40000;
+    vector<string> A40000;
+    print_all(40000,start40000,finish40000,A40000);
+    vector<int> finish80000;
+    vector<int> start80000;
+    vector<string> A80000;
+    print_all(80000,start80000,finish80000,A80000);
+    vector<int> finish100000;
+    vector<int> start100000;
+    vector<string> A100000;
+    print_all(100000,start100000,finish100000,A100000);
 }
